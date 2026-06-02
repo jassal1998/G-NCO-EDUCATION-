@@ -1,34 +1,38 @@
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import HomeScreen from '../ screens/HomeScreen';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import BottomTabs from './BottomTabs';
+import SchoolDetails from '../ screens/Category Screen/SchoolDetails';
+import FeesDetailsScreen from '../ screens/Category Screen/fees';
 
 
 
-const Tab = createBottomTabNavigator();
+
+
+const Stack = createNativeStackNavigator();
 
 const MainNavigation = () => {
   return (
     <NavigationContainer>
-      <Tab.Navigator
-        screenOptions={{
-          headerShown: false,
-        }}>
-        <Tab.Screen
-          name="Home"
-          component={HomeScreen}
-        />
+      <Stack.Navigator screenOptions={{headerShown: false}}>
 
-        {/* <Tab.Screen
-          name="School"
-          component={SchoolScreen}
+        {/* Bottom Tabs */}
+        <Stack.Screen
+          name="MainTabs"
+          component={BottomTabs}
         />
-
-        <Tab.Screen
-          name="Account"
-          component={AccountScreen}
-        /> */}
-      </Tab.Navigator>
+        <Stack.Screen
+  name="SchoolDetails"
+  component={SchoolDetails}
+  options={{title: 'School Details'}}
+/>
+   <Stack.Screen
+  name="FeesDetailsScreen"
+  component={FeesDetailsScreen}
+  options={{title: 'Fees Details'}}
+/>
+      
+      </Stack.Navigator>
     </NavigationContainer>
   );
 };

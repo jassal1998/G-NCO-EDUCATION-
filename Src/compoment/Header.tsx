@@ -6,7 +6,7 @@ const Header = () => {
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>G N CO EDUCATION HIGH SCHOOL</Text>
+        <Text style={styles.title}>SCHOOL</Text>
       </View>
     </SafeAreaView>
   );
