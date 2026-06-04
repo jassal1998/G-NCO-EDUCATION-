@@ -19,22 +19,27 @@ const categories = [
 const CategorySection = () => {
   const navigation = useNavigation<any>();
 
-  const handleNavigation = (title: string) => {
-    switch (title) {
-     
-       case 'School':
-        navigation.navigate('SchoolDetails');
-        break;
+ const handleNavigation = (title: string) => {
+  switch (title) {
+    case 'School':
+      navigation.navigate('SchoolDetails');
+      break;
 
-       case 'Fees Details':
-        navigation.navigate('FeesDetailsScreen');
-        break;
+    case 'Fees Details':
+      navigation.navigate('FeesDetailsScreen');
+      break;
 
-      default:
-        break;
-    }
-  };
+    case 'Attendance':
+      navigation.navigate('AttendanceScreen');
+      break;
+      case 'Homework':
+  navigation.navigate('HomeworkScreen');
+  break;
 
+    default:
+      break;
+  }
+};
   return (
     <FlatList
       data={categories}
