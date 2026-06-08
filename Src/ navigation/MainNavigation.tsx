@@ -15,6 +15,8 @@ import CategoryTeacher from '../Teacher/CategorySection';
 import FeesScreen from '../Teacher/FeesScreen';
 import AttendanceScreenTeacher from '../Teacher/AttendanceScreen';
 import HomeworkScreenTeacher from '../Teacher/HomeworkScreen';
+import ResultUploadScreen from '../Teacher/Teacherresult';
+import ReportCardScreen from '../Teacher/ReportCardScreen';
 
 
 
@@ -78,6 +80,14 @@ const MainNavigation = () => {
 <Stack.Screen
   name="HomeworkScreenTeacher"
   component={HomeworkScreenTeacher}
+/>
+<Stack.Screen
+  name="ResultUploadScreen"
+  component={ResultUploadScreen}
+/>
+<Stack.Screen
+  name="ReportCardScreen"
+  component={ReportCardScreen}
 />
       </Stack.Navigator>
     </NavigationContainer>

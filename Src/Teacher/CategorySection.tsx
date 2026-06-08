@@ -98,7 +98,7 @@ const CategorySection = () => {
     } else if (item.title === 'Fees') {
       navigation.navigate('FeesScreen');
     } else if (item.title === 'Attendance') {
-      navigation.navigate('AttendanceScreenTeacher');
+      navigation.navigate('ReportCardScreen');
     } else if (item.title === 'Homework') {
       navigation.navigate('HomeworkScreenTeacher');
     } else if (item.title === 'Complaints') {
@@ -106,7 +106,7 @@ const CategorySection = () => {
     } else if (item.title === 'Timetable') {
       navigation.navigate('TimetableScreen');
     } else if (item.title === 'Results') {
-      navigation.navigate('ResultScreen');
+      navigation.navigate('ResultUploadScreen');
     } else if (item.title === 'Notices') {
       navigation.navigate('NoticeScreen');
     }
