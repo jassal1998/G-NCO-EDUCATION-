@@ -1,12 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-
+import {useDispatch, useSelector} from 'react-redux';
+import {fetchMySchool} from '../Redux/api/schoolApiMethods';
 const Header = () => {
+
+   const dispatch = useDispatch<any>();
+    const {school, loading} = useSelector(
+       (state: any) => state.school,
+     );
+     console.log("Aaadda",school)
+      useEffect(() => {
+         dispatch(fetchMySchool());
+       }, []);
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>SCHOOL</Text>
+        <Text style={styles.title}>   {school?.data?.profileData?.school?.schoolName}</Text>
       </View>
     </SafeAreaView>
   );

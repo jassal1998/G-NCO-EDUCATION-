@@ -17,6 +17,9 @@ import AttendanceScreenTeacher from '../Teacher/AttendanceScreen';
 import HomeworkScreenTeacher from '../Teacher/HomeworkScreen';
 import ResultUploadScreen from '../Teacher/Teacherresult';
 import ReportCardScreen from '../Teacher/ReportCardScreen';
+import SplashScreen from '../authScreen/SplashScreen';
+import HomeworkDetails from '../ screens/Category Screen/HomeworkDetails Screen';
+import UpdateAttendance from '../Teacher/UpdateAttendance';
 
 
 
@@ -25,11 +28,17 @@ const Stack = createNativeStackNavigator();
 const MainNavigation = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Navigator
+  initialRouteName="SplashScreen"
+  screenOptions={{headerShown: false}}>
         <Stack.Screen
           name="RoleSelectionScreen"
           component={RoleSelectionScreen}
         />
+        <Stack.Screen
+  name="SplashScreen"
+  component={SplashScreen}
+/>
 
         <Stack.Screen
           name="LoginScreen"
@@ -61,6 +70,11 @@ const MainNavigation = () => {
           component={FeesDetailsScreen}
         />
 
+        <Stack.Screen
+          name="HomeworkDetails"
+          component={HomeworkDetails}
+        />
+
        <Stack.Screen
   name="TeacherTabs"
   component={TeacherBottomTabs}
@@ -88,6 +102,10 @@ const MainNavigation = () => {
 <Stack.Screen
   name="ReportCardScreen"
   component={ReportCardScreen}
+/>
+<Stack.Screen
+  name="UpdateAttendance"
+  component={UpdateAttendance}
 />
       </Stack.Navigator>
     </NavigationContainer>

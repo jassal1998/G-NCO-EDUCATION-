@@ -8,18 +8,112 @@ import {
   Image,
   StatusBar,
   SafeAreaView,
+  ActivityIndicator,
   KeyboardAvoidingView,
   ScrollView,
   Platform,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useDispatch} from 'react-redux';
+import { loginUser } from '../Redux/store/slice/authslice';
+import { jwtDecode } from 'jwt-decode';
+import Toast from 'react-native-toast-message';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const LoginScreen = ({navigation}: any) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+   const dispatch = useDispatch<any>();
+const [email, setEmail] = useState('9999999998');
+const [password, setPassword] = useState('7d61c1');
+const [showPassword, setShowPassword] = useState(false);
+const [loading, setLoading] =
+  useState(false);
+const handleLogin = async () => {
+  console.log('HANDLE LOGIN START');
 
-  const handleLogin = () => {
-    navigation.replace('TeacherTabs');
-  };
+  try {
+   
+    if (!email.trim() || !password.trim()) {
+      Toast.show({
+        type: 'error',
+        text1: 'Validation Error',
+        text2: 'Please enter email and password',
+        position: "bottom"
+      });
+      return;
+    }
+     setLoading(true);
+
+    console.log('BEFORE DISPATCH');
+
+    const result = await dispatch(
+      loginUser({
+        username: email.trim(),
+        password: password.trim(),
+      }),
+    );
+
+    console.log('AFTER DISPATCH');
+    console.log('RESULT =>', JSON.stringify(result, null, 2));
+
+    if (loginUser.fulfilled.match(result)) {
+      console.log('LOGIN SUCCESS');
+
+      const accessToken = result.payload?.user?.data?.accessToken;
+      const refreshToken = result.payload?.user?.data?.refreshToken;
+
+      if (!accessToken) {
+        throw new Error('Access Token not found in response');
+      }
+
+      await AsyncStorage.setItem('token', accessToken);
+
+      if (refreshToken) {
+        await AsyncStorage.setItem('refreshToken', refreshToken);
+      }
+
+      const decoded: any = jwtDecode(accessToken);
+
+      console.log('DECODED =>', decoded);
+
+      Toast.show({
+        type: 'success',
+        text1: 'Login Successful',
+        text2: 'Welcome Back',
+        position:"bottom"
+      });
+
+      if (decoded?.role === 'ROLE_STUDENT') {
+        navigation.replace('MainTabs');
+      } else if (decoded?.role === 'ROLE_TEACHER') {
+        navigation.replace('TeacherTabs');
+      }
+    } else {
+      console.log('LOGIN FAILED =>', result);
+
+      Toast.show({
+        type: 'error',
+        text1: 'Login Failed',
+        text2: result.payload || 'Invalid credentials',
+        position:"bottom"
+      });
+    }
+  } catch (error: any) {
+    
+    console.log('LOGIN ERROR =>', error);
+
+    Toast.show({
+      type: 'error',
+      text1: 'Error',
+      text2: error?.message || 'Something went wrong',
+      position:"bottom"
+    });
+  }
+finally {
+  setLoading(false);
+}
+  
+};
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -68,23 +162,45 @@ const LoginScreen = ({navigation}: any) => {
           />
 
           {/* Password */}
-          <TextInput
-            placeholder="Password"
-            placeholderTextColor="#888"
-            value={password}
-            onChangeText={setPassword}
-            style={styles.input}
-            secureTextEntry
-          />
+         <View style={styles.passwordContainer}>
+  <TextInput
+    placeholder="Password"
+    placeholderTextColor="#888"
+    value={password}
+    onChangeText={setPassword}
+    style={styles.passwordInput}
+    secureTextEntry={!showPassword}
+  />
+
+  <TouchableOpacity
+    onPress={() => setShowPassword(!showPassword)}
+    style={styles.eyeButton}>
+    <Icon
+      name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+      size={24}
+      color="#666"
+    />
+  </TouchableOpacity>
+</View>
 
           {/* Login Button */}
-          <TouchableOpacity
-            style={styles.loginButton}
-            onPress={handleLogin}>
-            <Text style={styles.loginText}>
-              Login
-            </Text>
-          </TouchableOpacity>
+         <TouchableOpacity
+  style={styles.loginButton}
+  onPress={handleLogin}
+  disabled={loading}>
+  
+  {loading ? (
+    <ActivityIndicator
+      size="small"
+      color="#fff"
+    />
+  ) : (
+    <Text style={styles.loginText}>
+      Login
+    </Text>
+  )}
+
+</TouchableOpacity>
 
           {/* Forgot Password */}
           <TouchableOpacity>
@@ -190,4 +306,33 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 25,
   },
+  passwordContainer: {
+  height: 60,
+  backgroundColor: '#FFFFFF',
+  borderRadius: 18,
+  paddingHorizontal: 20,
+  marginBottom: 20,
+  flexDirection: 'row',
+  alignItems: 'center',
+
+  shadowColor: '#000',
+  shadowOffset: {
+    width: 0,
+    height: 2,
+  },
+  shadowOpacity: 0.08,
+  shadowRadius: 5,
+  elevation: 4,
+},
+
+passwordInput: {
+  flex: 1,
+  fontSize: 16,
+},
+
+eyeButton: {
+  padding: 5,
+},
 });
+
+

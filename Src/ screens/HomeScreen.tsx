@@ -1,20 +1,48 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
+  ScrollView,
 } from 'react-native';
 import Header from '../compoment/Header';
 import SchoolGallery from '../compoment/SchoolGallery';
 import CategorySection from '../compoment/CategorySection';
-
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useDispatch, useSelector} from 'react-redux';
+import {fetchMySchool} from '../Redux/api/schoolApiMethods';
 const HomeScreen = () => {
+  useEffect(() => {
+    const checkTokens = async () => {
+      const token = await AsyncStorage.getItem('token');
+
+      const refreshToken =
+        await AsyncStorage.getItem(
+          'refreshToken',
+        );
+
+      console.log('TOKEN =>', token);
+      console.log(
+        'REFRESH TOKEN =>',
+        refreshToken,
+      );
+    };
+
+    checkTokens();
+  }, []);
+
   return (
     <View style={styles.container}>
       <Header />
-      <View>   <SchoolGallery /></View>
-      <View><CategorySection /></View>
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}>
+        
+        <SchoolGallery />
+
+        <CategorySection />
+
+      </ScrollView>
     </View>
   );
 };
@@ -24,14 +52,10 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
   },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+
+  scrollContent: {
+    paddingBottom: 30,
   },
 });

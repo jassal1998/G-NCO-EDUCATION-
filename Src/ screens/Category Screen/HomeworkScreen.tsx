@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   View,
   Text,
@@ -6,141 +6,239 @@ import {
   StyleSheet,
   SafeAreaView,
   StatusBar,
+  ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
-
-const homeworkData = [
-  {
-    id: '1',
-    subject: 'Mathematics',
-    title: 'Complete Chapter 5 Exercise',
-    dueDate: '03 Jun 2026',
-    status: 'Pending',
-  },
-  {
-    id: '2',
-    subject: 'English',
-    title: 'Essay Writing',
-    dueDate: '02 Jun 2026',
-    status: 'Completed',
-  },
-  {
-    id: '3',
-    subject: 'Science',
-    title: 'Learn Human Digestive System',
-    dueDate: '01 Jun 2026',
-    status: 'Pending',
-  },
-  {
-    id: '4',
-    subject: 'Computer',
-    title: 'MS Word Practical',
-    dueDate: '31 May 2026',
-    status: 'Completed',
-  },
-];
+import {useDispatch, useSelector} from 'react-redux';
+import {fetchStudentHomework} from '../../Redux/api/schoolApiMethods';
+import { useNavigation } from '@react-navigation/native';
 
 const HomeworkScreen = () => {
-  const completedCount = homeworkData.filter(
-    item => item.status === 'Completed',
-  ).length;
+  const dispatch = useDispatch<any>();
+const navigation = useNavigation<any>();
+  const {homeworks, loading, error} =
+    useSelector(
+      (state: any) => state.school,
+    );
 
-  const pendingCount = homeworkData.filter(
-    item => item.status === 'Pending',
-  ).length;
+  useEffect(() => {
+    console.log(
+      '🚀 HOMEWORK API CALL',
+    );
 
-  const totalCount = homeworkData.length;
+    dispatch(
+      fetchStudentHomework(),
+    );
+  }, []);
 
-  const renderItem = ({item}: any) => (
+  useEffect(() => {
+    console.log(
+      '📚 HOMEWORK REDUX DATA =>',
+      JSON.stringify(
+        homeworks,
+        null,
+        2,
+      ),
+    );
+  }, [homeworks]);
+
+  const homeworkData = Array.isArray(
+    homeworks,
+  )
+    ? homeworks
+    : [];
+
+  const completedCount =
+    homeworkData.filter(
+      (item: any) =>
+        item.status ===
+        'COMPLETED',
+    ).length;
+
+  const pendingCount =
+    homeworkData.filter(
+      (item: any) =>
+        item.status ===
+        'PENDING',
+    ).length;
+
+  const totalCount =
+    homeworkData.length;
+
+  const renderItem = ({
+    item,
+  }: any) => (
     <View style={styles.card}>
       <View style={{flex: 1}}>
         <Text style={styles.subject}>
-          {item.subject}
+          {item.subject ||
+            item.subjectName}
         </Text>
 
         <Text style={styles.title}>
-          {item.title}
+          {item.title ||
+            item.homeworkTitle}
         </Text>
 
         <Text style={styles.date}>
-          Due Date: {item.dueDate}
+          Due Date:{' '}
+          {item.dueDate ||
+            item.submissionDate}
         </Text>
       </View>
 
-      <View
-        style={[
-          styles.statusBox,
-          {
-            backgroundColor:
-              item.status === 'Completed'
-                ? '#22C55E'
-                : '#F59E0B',
-          },
-        ]}>
-        <Text style={styles.statusText}>
-          {item.status}
-        </Text>
-      </View>
+<View
+  style={[
+    styles.statusBox,
+    {
+      backgroundColor: '#1565C0',
+    },
+  ]}>
+  <TouchableOpacity
+    onPress={() =>
+      navigation.navigate(
+        'HomeworkDetails',
+        {
+          homework: item,
+        },
+      )
+    }>
+    <Text style={styles.statusText}>
+      View All
+    </Text>
+  </TouchableOpacity>
+</View>
     </View>
   );
 
+  if (loading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent:
+            'center',
+          alignItems: 'center',
+        }}>
+        <ActivityIndicator
+          size="large"
+          color="#2563EB"
+        />
+        <Text
+          style={{
+            marginTop: 10,
+          }}>
+          Loading Homework...
+        </Text>
+      </View>
+    );
+  }
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={styles.container}>
       <StatusBar
-        backgroundColor="#2563EB"
+        backgroundColor="#1565C0"
         barStyle="light-content"
       />
 
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>
+        <Text
+          style={styles.headerTitle}>
           Homework
         </Text>
 
-        <Text style={styles.headerSubTitle}>
-          Student Homework Records
+        <Text
+          style={
+            styles.headerSubTitle
+          }>
+          Student Homework
+          Records
         </Text>
       </View>
 
-      <View style={styles.contentContainer}>
-        <View style={styles.summaryContainer}>
-
-          <View style={styles.summaryCard}>
-            <Text style={styles.count}>
+      <View
+        style={
+          styles.contentContainer
+        }>
+        <View
+          style={
+            styles.summaryContainer
+          }>
+          <View
+            style={
+              styles.summaryCard
+            }>
+            <Text
+              style={styles.count}>
               {totalCount}
             </Text>
-            <Text style={styles.label}>
+            <Text
+              style={styles.label}>
               Total
             </Text>
           </View>
 
-          <View style={styles.summaryCard}>
-            <Text style={styles.count}>
+          <View
+            style={
+              styles.summaryCard
+            }>
+            <Text
+              style={styles.count}>
               {pendingCount}
             </Text>
-            <Text style={styles.label}>
+            <Text
+              style={styles.label}>
               Pending
             </Text>
           </View>
 
-          <View style={styles.summaryCard}>
-            <Text style={styles.count}>
+          <View
+            style={
+              styles.summaryCard
+            }>
+            <Text
+              style={styles.count}>
               {completedCount}
             </Text>
-            <Text style={styles.label}>
+            <Text
+              style={styles.label}>
               Completed
             </Text>
           </View>
-
         </View>
 
-        <Text style={styles.historyTitle}>
+        <Text
+          style={
+            styles.historyTitle
+          }>
           Homework History
         </Text>
 
+        {error ? (
+          <Text
+            style={{
+              color: 'red',
+              marginBottom: 10,
+            }}>
+            {error}
+          </Text>
+        ) : null}
+
         <FlatList
           data={homeworkData}
-          keyExtractor={item => item.id}
-          renderItem={renderItem}
-          showsVerticalScrollIndicator={false}
+          keyExtractor={(
+            item,
+            index,
+          ) =>
+            index.toString()
+          }
+          renderItem={
+            renderItem
+          }
+          showsVerticalScrollIndicator={
+            false
+          }
           contentContainerStyle={{
             paddingBottom: 30,
           }}
@@ -152,108 +250,114 @@ const HomeworkScreen = () => {
 
 export default HomeworkScreen;
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F4F7FE',
-  },
+const styles =
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor:
+        '#F4F7FE',
+    },
 
-  header: {
-  backgroundColor: '#4A90E2',
-    paddingTop: 50,
-    paddingBottom: 90,
-    paddingHorizontal: 20,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-  },
+    header: {
+      backgroundColor:
+        '#1565C0',
+      paddingTop: 50,
+      paddingBottom: 90,
+      paddingHorizontal: 20,
+      borderBottomLeftRadius: 30,
+      borderBottomRightRadius: 30,
+    },
 
-  headerTitle: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
+    headerTitle: {
+      fontSize: 30,
+      fontWeight: 'bold',
+      color: '#fff',
+    },
 
-  headerSubTitle: {
-    fontSize: 15,
-    color: '#E5E7EB',
-    marginTop: 5,
-  },
+    headerSubTitle: {
+      fontSize: 15,
+      color: '#E5E7EB',
+      marginTop: 5,
+    },
 
-  contentContainer: {
-    flex: 1,
-    marginTop: -50,
-    paddingHorizontal: 20,
-  },
+    contentContainer: {
+      flex: 1,
+      marginTop: -50,
+      paddingHorizontal: 20,
+    },
 
-  summaryContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 25,
-  },
+    summaryContainer: {
+      flexDirection: 'row',
+      justifyContent:
+        'space-between',
+      marginBottom: 25,
+    },
 
-  summaryCard: {
-    width: '31%',
-    backgroundColor: '#fff',
-    borderRadius: 18,
-    paddingVertical: 20,
-    alignItems: 'center',
-    elevation: 5,
-  },
+    summaryCard: {
+      width: '31%',
+      backgroundColor:
+        '#fff',
+      borderRadius: 18,
+      paddingVertical: 20,
+      alignItems: 'center',
+      elevation: 5,
+    },
 
-  count: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#2563EB',
-  },
+    count: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: '#2563EB',
+    },
 
-  label: {
-    marginTop: 5,
-    color: '#6B7280',
-  },
+    label: {
+      marginTop: 5,
+      color: '#6B7280',
+    },
 
-  historyTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    marginBottom: 15,
-    color: '#111827',
-  },
+    historyTitle: {
+      fontSize: 22,
+      fontWeight: '700',
+      marginBottom: 15,
+      color: '#111827',
+    },
 
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 18,
-    padding: 18,
-    marginBottom: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    elevation: 3,
-  },
+    card: {
+      backgroundColor:
+        '#fff',
+      borderRadius: 18,
+      padding: 18,
+      marginBottom: 14,
+      flexDirection: 'row',
+      alignItems: 'center',
+      elevation: 3,
+    },
 
-  subject: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#111827',
-  },
+    subject: {
+      fontSize: 17,
+      fontWeight: '700',
+      color: '#111827',
+    },
 
-  title: {
-    marginTop: 4,
-    color: '#4B5563',
-    fontSize: 14,
-  },
+    title: {
+      marginTop: 4,
+      color: '#4B5563',
+      fontSize: 14,
+    },
 
-  date: {
-    marginTop: 5,
-    color: '#6B7280',
-    fontSize: 13,
-  },
+    date: {
+      marginTop: 5,
+      color: '#6B7280',
+      fontSize: 13,
+    },
 
-  statusBox: {
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 25,
-  },
+    statusBox: {
+      paddingHorizontal: 15,
+      paddingVertical: 8,
+      borderRadius: 25,
+    },
 
-  statusText: {
-    color: '#fff',
-    fontWeight: '700',
-  },
-});
+    statusText: {
+      color: '#fff',
+      fontWeight: '700',
+    },
+  });

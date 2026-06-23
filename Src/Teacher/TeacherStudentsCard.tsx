@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -6,52 +6,38 @@ import {
   FlatList,
   TouchableOpacity,
   SafeAreaView,
+  ActivityIndicator,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
+import {useDispatch, useSelector} from 'react-redux';
+import { fetchStudentsAttendance } from '../Redux/api/teacherApiMethods';
 
-const students = [
-  {
-    id: '1',
-    name: 'Rahul Sharma',
-    class: '10-A',
-  },
-  {
-    id: '2',
-    name: 'Priya Singh',
-    class: '10-A',
-  },
-  {
-    id: '3',
-    name: 'Aman Kumar',
-    class: '10-B',
-  },
-  {
-    id: '4',
-    name: 'Neha Verma',
-    class: '10-B',
-  },
-  {
-    id: '5',
-    name: 'Arjun Patel',
-    class: '10-C',
-  },
-];
 
 const TeacherStudentsCard = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
-const navigation = useNavigation<any>();
+
+  const navigation = useNavigation<any>();
+  const dispatch = useDispatch<any>();
+
+ const {attendance, loading} = useSelector(
+  (state: any) => state.teacher,
+);
+console.log("sax",attendance)
+  useEffect(() => {
+    dispatch(fetchStudentsAttendance());
+  }, []);
+
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('en-GB');
   };
 
-
   const handleStudentPress = (student: any) => {
-  navigation.navigate('CategoryTeacher', {
-    student,
-  });
-};
+    navigation.navigate('CategoryTeacher', {
+      student,
+    });
+  };
 
   const onDateChange = (event: any, date?: Date) => {
     setShowPicker(false);
@@ -61,51 +47,50 @@ const navigation = useNavigation<any>();
     }
   };
 
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.heading}>My Students</Text>
 
       <FlatList
-        data={students}
-        keyExtractor={item => item.id}
+        data={attendance}
+        keyExtractor={(item: any, index) =>
+          item?.id?.toString() || index.toString()
+        }
         showsVerticalScrollIndicator={false}
-        renderItem={({item}) => (
+renderItem={({item}: any) => (
   <TouchableOpacity
     activeOpacity={0.8}
-    onPress={() => handleStudentPress(item)}
+    onPress={() =>
+      navigation.navigate('CategoryTeacher', {
+        studentId: item.studentId,
+        student: item,
+      })
+    }
     style={styles.card}>
-
-    <Text style={styles.name}>{item.name}</Text>
-
-    <Text style={styles.classText}>
-      Class: {item.class}
+    
+    <Text style={styles.name}>
+      {item.firstName} {item.lastName}
     </Text>
 
-    <View style={styles.actionRow}>
-      <TouchableOpacity
-        style={styles.dateBtn}
-        onPress={() => setShowPicker(true)}>
-        <Text style={styles.dateText}>
-          📅 {formatDate(selectedDate)}
-        </Text>
-      </TouchableOpacity>
+    <Text style={styles.classText}>
+      Class: {item.className}
+    </Text>
 
-      <TouchableOpacity
-        style={styles.presentBtn}
-        onPress={() => {
-          console.log('Present', item.id);
-        }}>
-        <Text style={styles.btnText}>Present</Text>
-      </TouchableOpacity>
+    <Text style={styles.classText}>
+      Section: {item.sectionName}
+    </Text>
 
-      <TouchableOpacity
-        style={styles.absentBtn}
-        onPress={() => {
-          console.log('Absent', item.id);
-        }}>
-        <Text style={styles.btnText}>Absent</Text>
-      </TouchableOpacity>
-    </View>
+    <Text style={styles.classText}>
+      Roll No: {item.rollNo}
+    </Text>
 
   </TouchableOpacity>
 )}
@@ -130,6 +115,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F3F4F6',
     paddingHorizontal: 15,
+  },
+
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   heading: {
